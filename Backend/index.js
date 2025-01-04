@@ -1,15 +1,16 @@
-const express = require("express");
-const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express");
-const morgan = require("morgan"); // Import Morgan
+import express from "express";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import morgan from "morgan";
+
+import authRouter from './routes/auth.routes.js';
+
 const app = express();
 
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-
-app.use(morgan("dev")); 
-
+app.use(morgan("dev"));
 
 const swaggerOptions = {
   definition: {
@@ -32,15 +33,12 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Sample API endpoint
-app.get("/api/v1/jobs", (req, res) => {
-  res.status(200).json({ message: "Job Listings" });
-});
+app.use('/api/auth', authRouter);
 
 // Server setup
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log("ENABLED MORGAN")  
+  console.log("ENABLED MORGAN");
   console.log(`Server running at http://localhost:${PORT}`);
   console.log(`Swagger Docs available at http://localhost:${PORT}/api-docs`);
 });

@@ -1,14 +1,14 @@
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
-module.exports = {
+export default {
   development: {
     client: "pg",
     connection: {
-      host: "ep-bitter-frog-a57ugcmi.us-east-2.aws.neon.tech", 
-      user: "jobportaldb_owner",
-      password: "J4njD3bWwBPz", 
-      database: "jobportaldb", 
+      host: "ep-morning-wave-a59lq455.us-east-2.aws.neon.tech", 
+      user: "jobportal_db_owner",
+      password: "6DFql5CfmGOL", 
+      database: "jobportal_db", 
       ssl: { rejectUnauthorized: false }, 
     },
     pool: {
