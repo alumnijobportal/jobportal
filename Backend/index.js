@@ -3,16 +3,12 @@ import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import bodyParser from "body-parser";
 import morgan from "morgan";
-import multer from "multer";
 import authRouter from "./routes/auth.routes.js";
 
 const app = express();
-const upload = multer();
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(upload.none());
-
 app.use(morgan("dev"));
 
 const swaggerOptions = {
