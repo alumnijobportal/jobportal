@@ -12,6 +12,7 @@ export async function up(knex) {
     table.string("phone");
     table.string("email");
     table.string("user_id");
+    table.dateTime('expires_at')
     table.boolean("is_verified").defaultTo(false);
     table.timestamps(true, true);
   });

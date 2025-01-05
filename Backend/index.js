@@ -1,39 +1,38 @@
 import express from "express";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
+import bodyParser from "body-parser";
 import morgan from "morgan";
-
-import authRouter from './routes/auth.routes.js';
+import multer from "multer";
+import authRouter from "./routes/auth.routes.js";
 
 const app = express();
+const upload = multer();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(upload.none());
 
 app.use(morgan("dev"));
 
 const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
+  swaggerDefinition: {
     info: {
       title: "Job Portal API",
       version: "1.0.0",
       description: "API documentation for the Job Portal backend",
     },
-    servers: [
-      {
-        url: "http://localhost:3000",
-        description: "Development server",
-      },
-    ],
+    host: "localhost:5000",
+    basePath: "/",
+    schemes: ["http"],
   },
-  apis: ["./routes/*.js"],
+  apis: ["./routes/*.js"], // Path to the API docs
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.use('/api/auth', authRouter);
+app.use("/api/auth", authRouter);
 
 // Server setup
 const PORT = process.env.PORT || 5000;

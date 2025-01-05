@@ -8,7 +8,7 @@ import { generateOTPAndSend } from "../utils/otpManager.js";
 const registerUser = async (req, res) => {
   try {
     const { fullname, email, password, phone, batch } = req.body;
-    console.log(req.body)
+    console.log(req.body);
 
     if (!fullname || !email || !password || !phone || !batch) {
       return res
@@ -21,8 +21,7 @@ const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 1);
     const currentYear = new Date().getFullYear();
     const status = currentYear - batch >= 4 ? "ALUMNI" : "STUDENT";
-
-    await db("users").insert({
+    let data = {
       fullname,
       email,
       password: hashedPassword,
@@ -30,10 +29,13 @@ const registerUser = async (req, res) => {
       batch,
       status: status,
       work_status: null,
-    });
+    };
+
+    await db("users").insert(data).returning("*");
 
     return res.status(200).send({
       response: {
+        data: data,
         title: "User Created",
         message: "User Created Successfully",
         status: 200,
@@ -109,46 +111,44 @@ const loginUser = async (req, res) => {
 const sendEmailVerificationOtp = async (req, res) => {
   try {
     const { email } = req.body;
+
+   
     if (!email) {
       return res
         .status(400)
         .send(errorHandler(400, "Invalid Request", "Please Enter The Email"));
     }
-    const id = await db("users")
-      .select("id")
-      .where({
-        email,
-      })
-      .first();
 
-    const success = await generateOTPAndSend(email, id);
+  
+    const userExists = await db("users").where("email", email).first();
+    if (!userExists) {
+      return res
+        .status(404)
+        .send(errorHandler(404, "Not Found", "User Not Found"));
+    }
 
+    const success = await generateOTPAndSend(email);
     if (success) {
-      res.status(200).json({ message: "OTP generated and sent successfully" });
+      return res
+        .status(200)
+        .json({ message: "OTP generated and sent successfully" }); 
     } else {
       return res
         .status(500)
         .send(
           errorHandler(
             500,
-            "Error Occured",
-            "Some Error Occureed While Generating OTP"
+            "Error Occurred",
+            "Failed to generate or send OTP"
           )
         );
     }
   } catch (error) {
     console.error("Error in OTP generation:", error);
-    return res
-      .status(500)
-      .send(
-        errorHandler(
-          500,
-          "Server Error",
-          "Internal Server Error While Sending OTP"
-        )
-      );
+    return res.status(500).send(errorHandler(500, "Server Error", error.message));
   }
 };
+
 
 const verifyOTP = async (req, res) => {
   try {
@@ -209,7 +209,6 @@ const verifyOTP = async (req, res) => {
         is_verified: true,
       });
 
-    res.status(200).json({ message: "OTP successfully verified!" });
     const payload = {
       id: userDetails.id,
       status: userDetails.status,
@@ -242,9 +241,4 @@ const verifyOTP = async (req, res) => {
   }
 };
 
-export {
-  registerUser,
-  loginUser,
-  sendEmailVerificationOtp,
-  verifyOTP,
-};
+export { registerUser, loginUser, sendEmailVerificationOtp, verifyOTP };

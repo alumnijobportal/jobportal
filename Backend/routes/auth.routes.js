@@ -1,10 +1,12 @@
-import express from "express"
+import express from "express";
 import {
   registerUser,
   loginUser,
   sendEmailVerificationOtp,
   verifyOTP,
 } from "../controllers/auth.controllers.js";
+import multer from "multer";
+const upload = multer({ dest: "uploads/" });
 
 const router = express.Router();
 
@@ -12,75 +14,136 @@ const router = express.Router();
  * @swagger
  * /api/auth/register:
  *   post:
- *     summary: Register A New User
- *     description: API endpoint to register a new user by providing personal details and uploading a resume.
+ *     summary: Register a New User
+ *     description: API endpoint to register a new user using form-data parameters.
  *     tags:
  *       - Authentication
  *     consumes:
  *       - multipart/form-data
  *     parameters:
- *       - name: fullname
- *         in: formData
- *         description: Full name of the user
- *         required: true
+ *       - in: formData
+ *         name: fullname
  *         type: string
- *       - name: email
- *         in: formData
- *         description: Email address of the user
  *         required: true
+ *         description: Full name of the user.
+ *       - in: formData
+ *         name: email
  *         type: string
- *       - name: password
- *         in: formData
- *         description: Password for the user account
  *         required: true
+ *         description: Email address of the user.
+ *       - in: formData
+ *         name: password
  *         type: string
- *       - name: phone
- *         in: formData
- *         description: Phone number of the user
  *         required: true
+ *         description: Password for the user account.
+ *       - in: formData
+ *         name: phone
  *         type: string
- *       - name: batch
- *         in: formData
- *         description: Batch year of the user
  *         required: true
+ *         description: Phone number of the user.
+ *       - in: formData
+ *         name: batch
  *         type: integer
+ *         required: true
+ *         description: Batch year of the user.
  *     responses:
  *       '200':
- *         description: added successfully
+ *         description: User registered successfully.
+ *       '400':
+ *         description: Invalid input.
  *       '500':
- *         description: server error
+ *         description: Server error.
  */
+
 router.post("/register", registerUser);
 
 /**
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Logging In A User
- *     description: API endpoint to login a user by providing email and password.
+ *     summary: Logging In a  User
+ *     description: API endpoint to logging in a new user using form-data parameters.
  *     tags:
  *       - Authentication
+ *     consumes:
+ *       - multipart/form-data
  *     parameters:
- *       - name: email
- *         in: formData
- *         description: Email address of the user
- *         required: true
+ *       - in: formData
+ *         name: email
  *         type: string
- *       - name: password
- *         in: formData
- *         description: Password for the user account
  *         required: true
+ *         description: Email address of the user.
+ *       - in: formData
+ *         name: password
  *         type: string
+ *         required: true
+ *         description: Password for the user account.
  *     responses:
  *       '200':
- *         description: Login successful and JWT returned
+ *         description: User Logged In Successfully.
  *       '400':
- *         description: Invalid credentials or missing fields
+ *         description: Invalid input.
  *       '500':
- *         description: server error
+ *         description: Server error.
  */
 router.post("/login", loginUser);
-router.post("get-login-otp", sendEmailVerificationOtp);
-router.post("verify-login-otp", verifyOTP);
 
-export default router
+/**
+ * @swagger
+ * /api/auth/get-login-otp:
+ *   post:
+ *     summary: get OTP for logging in a user
+ *     description: API endpoint to logging in by OTP a new user using form-data parameters.
+ *     tags:
+ *       - Authentication
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: email
+ *         type: string
+ *         required: true
+ *         description: Email address of the user.
+ *     responses:
+ *       '200':
+ *         description: OTP generated and sent successfully.
+ *       '400':
+ *         description: Invalid input.
+ *       '500':
+ *         description: Server error.
+ */
+
+router.post("/get-login-otp", sendEmailVerificationOtp);
+
+/**
+ * @swagger
+ * /api/auth/verify-login-otp:
+ *   post:
+ *     summary: verify OTP for logging in a user
+ *     description: API endpoint to verify OTP for logging in a new user using form-data parameters.
+ *     tags:
+ *       - Authentication
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: email
+ *         type: string
+ *         required: true
+ *         description: Email address of the user.
+ *       - in: formData
+ *         name: otp
+ *         type: string
+ *         required: true
+ *         description: Enter the OTP received.
+ *     responses:
+ *       '200':
+ *         description: User Logged In Successfully.
+ *       '400':
+ *         description: Invalid input.
+ *       '500':
+ *         description: Server error.
+ */
+router.post("/verify-login-otp", verifyOTP);
+
+export default router;
