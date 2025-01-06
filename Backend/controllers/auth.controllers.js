@@ -89,17 +89,19 @@ const loginUser = async (req, res) => {
           )
         );
     }
-    const user = await db("users").where({ email }).first();
-    const userDetails = await db("users").select("*").where({
-      email: email,
-    });
-    if (!user) {
+
+    const userDetails = await db("users").select("*").where({ email: email });
+
+    if (!userDetails || userDetails.length === 0) {
       return res
         .status(404)
         .send(
           errorHandler(404, "User Not Found", "No user found with this email")
         );
     }
+
+    const user = userDetails[0];
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res
@@ -107,9 +109,9 @@ const loginUser = async (req, res) => {
         .send(errorHandler(401, "Unauthorized", "Invalid password"));
     }
     const payload = {
-      id: user.id,
-      status: user.status,
-      email: user.email,
+      id: userDetails.id,
+      status: userDetails.status,
+      email: userDetails.email,
     };
 
     const token = jwt.sign(payload, "jwt_secret", { expiresIn: "1h" });
@@ -263,11 +265,11 @@ const verifyOTP = async (req, res) => {
 
 const createCompany = async (req, res) => {
   try {
+    const { id } = req.user;
     const {
       company_name,
       company_url,
       company_address,
-      user_id,
       industry_type,
       user_designation,
       number_of_employees,
@@ -277,26 +279,29 @@ const createCompany = async (req, res) => {
     //   return res.status(400).send({ error: "Missing required fields" });
     // }
 
-    const descriptionTempPath = req.files['company_description_pdf'][0].path;
-    const descriptionUpload = await cloudinary.v2.uploader.upload(descriptionTempPath, {
-      folder: 'company_profile',
-      resource_type: 'auto',
-    });
+    const descriptionTempPath = req.files["company_description_pdf"][0].path;
+    const descriptionUpload = await cloudinary.v2.uploader.upload(
+      descriptionTempPath,
+      {
+        folder: "company_profile",
+        resource_type: "auto",
+      }
+    );
     const descriptionUrl = descriptionUpload.secure_url;
     fs.unlinkSync(descriptionTempPath); // Delete temp file
 
-    const logoTempPath = req.files['company_logo'][0].path;
+    const logoTempPath = req.files["company_logo"][0].path;
     const logoUpload = await cloudinary.v2.uploader.upload(logoTempPath, {
-      folder: 'company_profile',
+      folder: "company_profile",
     });
-    const profileImageUrl = logoUpload .secure_url;
+    const profileImageUrl = logoUpload.secure_url;
     fs.unlinkSync(logoTempPath); // Delete temp file
 
     let data = {
       company_name,
       company_url,
       company_address,
-      user_id,
+      user_id: id,
       industry_type,
       user_designation,
       number_of_employees,

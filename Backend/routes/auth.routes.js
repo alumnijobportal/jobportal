@@ -4,11 +4,9 @@ import {
   loginUser,
   sendEmailVerificationOtp,
   verifyOTP,
-  createCompany,
 } from "../controllers/auth.controllers.js";
-import upload from "../config/multer/index.js"
-
-
+import { authenticateJWT } from "../utils/verifyToken.js";
+import upload from "../config/multer/index.js";
 
 const router = express.Router();
 
@@ -21,7 +19,7 @@ const router = express.Router();
  *     tags:
  *       - Authentication
  *     consumes:
- *       - multipart/form-data
+ *       - application/x-www-form-urlencoded
  *     parameters:
  *       - in: formData
  *         name: fullname
@@ -68,7 +66,7 @@ const router = express.Router();
  *         description: Server error.
  */
 
-router.post('/register', upload.single('resume'), registerUser);
+router.post("/register", upload.single("resume"), registerUser);
 
 /**
  * @swagger
@@ -79,7 +77,7 @@ router.post('/register', upload.single('resume'), registerUser);
  *     tags:
  *       - Authentication
  *     consumes:
- *       - multipart/form-data
+ *       - application/x-www-form-urlencoded
  *     parameters:
  *       - in: formData
  *         name: email
@@ -105,12 +103,12 @@ router.post("/login", loginUser);
  * @swagger
  * /api/auth/get-login-otp:
  *   post:
- *     summary: get OTP for logging in a user
- *     description: API endpoint to logging in by OTP a new user using form-data parameters.
+ *     summary: Get OTP for logging in a user
+ *     description: API endpoint for logging in using OTP through form-data parameters.
  *     tags:
  *       - Authentication
  *     consumes:
- *       - multipart/form-data
+ *       - application/x-www-form-urlencoded
  *     parameters:
  *       - in: formData
  *         name: email
@@ -137,7 +135,7 @@ router.post("/get-login-otp", sendEmailVerificationOtp);
  *     tags:
  *       - Authentication
  *     consumes:
- *       - multipart/form-data
+ *       - application/x-www-form-urlencoded
  *     parameters:
  *       - in: formData
  *         name: email
@@ -158,71 +156,5 @@ router.post("/get-login-otp", sendEmailVerificationOtp);
  *         description: Server error.
  */
 router.post("/verify-login-otp", verifyOTP);
-/**
- * @swagger
- * /api/auth/create-company:
- *   post:
- *     summary: Add your company along with its details
- *     description: API endpoint for adding company details
- *     tags:
- *       - Authentication
- *     consumes:
- *       - multipart/form-data
- *     parameters:
- *       - in: formData
- *         name: company_name
- *         type: string
- *         required: true
- *         description: Enter the company name.
- *       - in: formData
- *         name: company_url
- *         type: string
- *         required: true
- *         description: Enter the company URL.
- *       - in: formData
- *         name: company_address
- *         type: string
- *         required: true
- *         description: Enter the company address.
- *       - in: formData
- *         name: user_id
- *         type: string
- *         required: true
- *         description: Enter the user ID.
- *       - in: formData
- *         name: industry_type
- *         type: string
- *         required: true
- *         enum: [Technology, Finance, Healthcare, Education, Retail, Manufacturing, Other]
- *         description: Enter the industry type.
- *       - in: formData
- *         name: user_designation
- *         type: string
- *         required: true
- *         description: Enter your designation.
- *       - in: formData
- *         name: number_of_employees
- *         type: integer
- *         required: true
- *         description: Enter the number of employees.
- *       - in: formData
- *         name: company_description_pdf
- *         type: file
- *         required: true
- *         description: Upload the company description pdf.
- *       - in: formData
- *         name: company_logo
- *         type: file
- *         required: true
- *         description: Upload the company_logo.
- *     responses:
- *       '201':
- *         description: Company created successfully.
- *       '400':
- *         description: Invalid input.
- *       '500':
- *         description: Server error.
- */
-router.post("/create-company",  upload.fields([{ name: 'company_description_pdf', maxCount: 1 }, { name: 'company_logo', maxCount: 1 }]),  createCompany);
 
 export default router;
