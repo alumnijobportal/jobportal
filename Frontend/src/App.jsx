@@ -8,6 +8,7 @@ import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import PrivateRoute from "./components/utils/PrivateRoute";
 import Header from "./components/utils/Header";
+import ErrorPage from "./components/utils/ErrorPage";
 
 export default function App() {
   return (
@@ -20,10 +21,12 @@ export default function App() {
 
         <Route element={<ProtectedRoute />}>
          
-          <Route path="/landing" element={<><Header/> <Landing /></> } />
-          <Route path="/signup" element={<><Header/><Signup /></> } />
+          <Route path="/" element={<><Header/> <Landing /></> } />
+          <Route path="/register" element={<><Header/><Signup /></> } />
           <Route path="/login" element={<><Header/><Login /></>  } />
         </Route>
+
+        <Route path="*" element={<ErrorPage />} />
         
       </Routes>
     </BrowserRouter>

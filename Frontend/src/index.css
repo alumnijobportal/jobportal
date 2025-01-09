@@ -2,9 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar for the entire page */
+body::-webkit-scrollbar {
+  display: none;
+}
+
+
+
+/* Hide scrollbar */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hidden {
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+  scrollbar-width: none; /* For Firefox */
+}
 
 body {
-    background-color: #d9d9d9;
+    background-color: #e7e7e7;
     font-family: 'poppins';
-  }
-  
+  }  

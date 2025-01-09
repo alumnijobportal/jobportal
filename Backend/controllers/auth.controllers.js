@@ -14,7 +14,10 @@ cloudinary.v2.config({
 
 const registerUser = async (req, res) => {
   try {
+  
     const { fullname, email, password, phone, batch, work_status } = req.body;
+
+    
 
     if (!fullname || !email || !password || !phone || !batch || !work_status) {
       return res.status(400).json({ error: "Please fill all fields." });
@@ -23,19 +26,20 @@ const registerUser = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "Resume or image is required." });
     }
+    console.log("hi");
     const userExists = await db("users").where("email", email).first();
     if (userExists) {
       return res
         .status(400)
         .send(errorHandler(400, "Already Exists", "User Already Exists"));
     }
-
+   
     const tempPath = req.file.path;
     const cloudinaryUpload = await cloudinary.v2.uploader.upload(tempPath, {
       folder: "company_files",
       resource_type: "auto",
     });
-
+    
     const resumeUrl = cloudinaryUpload.secure_url;
     fs.unlinkSync(tempPath);
 
