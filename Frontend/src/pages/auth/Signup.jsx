@@ -183,7 +183,6 @@ export default function Signup() {
                 className="text-sm w-3/4 p-2 border-2 border-gray-200 rounded-lg bg-white text-slate-800 focus:border-gray-400 focus:outline-none"
                 id="batch"
                 onChange={handleChange}
-                value={graduationYear}
               >
                 {years.map((year) => (
                   <option key={year} value={year}>

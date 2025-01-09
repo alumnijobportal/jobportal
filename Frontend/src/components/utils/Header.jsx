@@ -7,7 +7,7 @@ export default function Header() {
     return (
       <header className="bg-white shadow-xl w-full flex justify-between items-center py-2 px-6 fixed top-0 z-20">
        
-        <div onClick={()=>navigate("/landing")} className="cursor-pointer" >
+        <div onClick={()=>navigate("/")} className="cursor-pointer" >
           <img src="/logo.png" alt="Logo" className="h-10" />
         </div>
         <nav className="flex gap-4 ">
