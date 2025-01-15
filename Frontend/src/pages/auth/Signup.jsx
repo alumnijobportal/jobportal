@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useNavigate ,useDispatch} from "react-router-dom";
+import { signInSuccess } from "../../redux/user/userSlice";
+import { registerUser } from "../../service/api";
 
 export default function Signup() {
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
+
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
@@ -31,12 +38,11 @@ export default function Signup() {
 
     // Validate inputs
     if (!formData.fullname || !formData.email || !formData.password || !formData.phone || !graduationYear || !resume || !batch) {
-      toast.error("Please fill all required fields and upload a valid resume!");
+      toast.error("Please fill all required fields!");
       return;
     }
     console.log(formData);
     
-    // Append form data for backend
     const data = new FormData();
     data.append("fullname", formData.fullname);
     data.append("email", formData.email);
@@ -48,18 +54,20 @@ export default function Signup() {
 
     try {
       toast.loading("Submitting...");
-      const response = await axios.post("http://localhost:5000/api/auth/register", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      toast.dismiss();
-      toast.success("User registered successfully!");
-      console.log(response.data);
+      const response = await registerUser(data);
+      if(response.success){
+      dispatch(signInSuccess(response.data))
+      toast.success(response.message);
+      navigate("/dashboard");
+      }else{
+        toast.error("Some error occured!");
+      }
+     
     } catch (error) {
-      toast.dismiss();
       toast.error("Something went wrong. Please try again.");
       console.error(error);
+    }finally{
+      toast.dismiss();
     }
   };
 
